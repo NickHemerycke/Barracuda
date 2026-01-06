@@ -1,0 +1,5 @@
+so currently we can return a value but we can't get the if logic yet to work
+This is quite frustrating as this is already way more complex then i imagined
+it's fun though can't wait till i get to play around with wasm
+
+

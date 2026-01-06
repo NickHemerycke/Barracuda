@@ -1,4 +1,4 @@
-from astNodes import varNode, IfNode, ReturnNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode
 
 class Parser:
     def __init__(self, tokens):
