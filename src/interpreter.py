@@ -33,12 +33,16 @@ class Interpreter:
     
     def execIf(self, node):
         left, _, right = node.condition
-        if self.env[left] == self.evalExpression(right):
+
+        conditionTrue = self.env[left] == self.evalExpression(right)
+
+        if conditionTrue:
             for stmt in node.thenBranch:
-                try:
-                    self.execStatement(stmt)
-                except ReturnSignal as r:
-                    raise r
+                self.execStatement(stmt)
+        elif node.elseBranch is not None:
+            for stmt in node.elseBranch:
+                self.execStatement(stmt)
+
 
     def execStatement(self, node):
         if isinstance(node, varNode):

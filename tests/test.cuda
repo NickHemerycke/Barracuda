@@ -1,5 +1,8 @@
 var int x == 5
-var int y == 5
+var int y == 6
 if: x == y
     return TRUE
+
+else:
+    return FALSE
 

@@ -90,17 +90,35 @@ class Parser:
 
         self.consume("INDENT")
 
-        body = []
+        thenBody = []
         while self.peek() and self.peek()[0] != "DEDENT":
             stmt = self.parseStatement()
             if stmt is not None:
-                body.append(stmt)
+                thenBody.append(stmt)
 
         self.consume("DEDENT")
 
+        if self.peek() and self.peek()[0] == "ELSE":
+            self.consume("ELSE")
+            self.consume("COLON")
+
+            if self.peek() and self.peek()[0] == "NEWLINE":
+                self.consume("NEWLINE")
+
+
+            self.consume("INDENT")
+
+            elseBody = []
+            while self.peek() and self.peek()[0] != "DEDENT":
+                stmt = self.parseStatement()
+                if stmt is not None:
+                    elseBody.append(stmt)
+            self.consume("DEDENT")
+
         return IfNode(
             condition=(left[1], "==", right),
-            thenBranch=body
+            thenBranch=thenBody,
+            elseBranch=elseBody
         )
 
     
