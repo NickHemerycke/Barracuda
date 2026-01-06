@@ -1,3 +1,0 @@
-readup on LLVM
-decide syntax architecture
-actually get rid of placeholder README file
