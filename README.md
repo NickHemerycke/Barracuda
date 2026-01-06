@@ -28,6 +28,7 @@ The current implementation (v0.1) uses a Python-based interpreter/compiler to tr
 📋 Example Usage
 
 sample.cuda
+
     var int x == 8
     var int y == 2
     var bool z == True

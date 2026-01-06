@@ -1,3 +1,5 @@
+from astNodes import varNode, IfNode, ReturnNode
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -131,15 +133,6 @@ class Parser:
         self.consume("DEDENT")
 
         return FuncNode(name, args, body)
-
-
-
     
 
-class varNode:
-
-    def __init__(self, varType, name, value_node):
-        self.varType = varType
-        self.name = name
-        self.value = value_node
 
