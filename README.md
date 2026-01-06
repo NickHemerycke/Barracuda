@@ -8,6 +8,7 @@
 Barracuda v0.1 (Proof of Concept)
 
 Welcome to the initial release of Barracuda, a language designed with type safety and Pythonic indentations to simplify high-performance frontend development.
+
 🌊 What is Barracuda?
 
 Barracuda is a proof-of-concept extension language that bridges the gap between readable Python-style logic and the raw performance of WebAssembly (Wasm).
@@ -25,22 +26,20 @@ The current implementation (v0.1) uses a Python-based interpreter/compiler to tr
     Python-Powered Compiler: A lightweight compiler written in Python that parses Barracuda source code (PoC phase).
 
 📋 Example Usage
-Python
 
-# sample.cuda
-var int x == 8
-var int y == 2
-var bool z == True
+sample.cuda
+    var int x == 8
+    var int y == 2
+    var bool z == True
 
-# Call the function and store the result
-check == additionLoop: x, y, z
+    check == additionLoop: x, y, z
 
-println: check
+    println: check
 
-func: additionLoop: a, b, c
-    while: a > b
-        a = a + 1
-    return: c
+    func: additionLoop: a, b, c
+        while: a > b
+            a = a + 1
+        return: c
 
 🚧 Current Limitations
 
