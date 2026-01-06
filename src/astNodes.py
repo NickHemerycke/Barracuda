@@ -6,9 +6,10 @@ class varNode:
         self.value = valueNode
 
 class IfNode:
-    def __init__(self, condition, then_branch):
+    def __init__(self, condition, thenBranch, elseBranch=None):
         self.condition = condition
-        self.then_branch = then_branch
+        self.thenBranch = thenBranch
+        self.elseBranch = elseBranch
 
 class ReturnNode:
     def __init__(self, value):

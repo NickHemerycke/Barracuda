@@ -1,3 +1,5 @@
+from astNodes import varNode, IfNode, ReturnNode
+
 class ReturnSignal(Exception):
     def __init__(self, value):
         self.value = value
@@ -8,6 +10,18 @@ class Interpreter:
 
     def evalExpression(self, node):
         kind, value = node
+        if kind == "NUM":
+            return int(value)
+        elif kind == "BOOL_VAL":
+            return value == "TRUE"
+        elif kind == "ID":
+            if value in self.env:
+                return self.env[value]
+            else:
+                raise NameError(f"Variable '{value}' not defined")
+        else:
+            raise ValueError(f"Unknown expression type: {kind}")
+
 
     def execVar(self, node):
         val = self.evalExpression(node.value)
@@ -21,9 +35,12 @@ class Interpreter:
         left, _, right = node.condition
         if self.env[left] == self.evalExpression(right):
             for stmt in node.thenBranch:
-                self.execStatement(stmt)
+                try:
+                    self.execStatement(stmt)
+                except ReturnSignal as r:
+                    raise r
 
-    def exec_statement(self, node):
+    def execStatement(self, node):
         if isinstance(node, varNode):
             self.execVar(node)
         elif isinstance(node, IfNode):
@@ -38,7 +55,6 @@ class Interpreter:
         except ReturnSignal as r:
             return r.value
     
-    main()
 
 
 

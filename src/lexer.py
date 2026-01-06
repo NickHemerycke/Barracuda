@@ -1,6 +1,5 @@
 import re
 
-
 TOKEN_SPEC = [
     ('FUNC',    r'func'),         
     ('VAR',     r'var'),           
@@ -15,37 +14,45 @@ TOKEN_SPEC = [
     ('COMMA',   r','),             
     ('ID',      r'[a-z_]+'),       
     ('NUM',     r'\d+'),          
-    ('TAB',     r'\t'),            
-    ('NEWLINE', r'\n'),           
     ('SKIP',    r'[ ]+'),          
-    ]
-    
-def lex_barracuda(code):
+]
+
+def lexBarracuda(code):
     lines = code.split('\n')
     tokens = []
-    current_level = 0  
-
-    for line_num, line in enumerate(lines):
-        if not line.strip(): continue 
+    current_level = 0 
+    
+    for line in lines:
         
-        
-        stripped_line = line.lstrip('\t')
-        tab_count = len(line) - len(stripped_line)
-        
-        
-        if tab_count > current_level:
-            tokens.append(('INDENT', tab_count))
-            current_level = tab_count
-        elif tab_count < current_level:
-            tokens.append(('DEDENT', tab_count))
-            current_level = tab_count
+        stripped_line = line.lstrip(' \t')
+        indent_count = len(line) - len(stripped_line)
 
         
+        if not stripped_line:
+            tokens.append(('NEWLINE', '\n'))
+            continue
+
+       
+        if indent_count > current_level:
+            tokens.append(('INDENT', indent_count))
+            current_level = indent_count
+        elif indent_count < current_level:
+            tokens.append(('DEDENT', indent_count))
+            current_level = indent_count
+
+     
         tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in TOKEN_SPEC)
         for mo in re.finditer(tok_regex, stripped_line):
             kind = mo.lastgroup
             value = mo.group()
             if kind != 'SKIP':
                 tokens.append((kind, value))
-                
+
+       
+        tokens.append(('NEWLINE', '\n'))
+
+    
+    if current_level > 0:
+        tokens.append(('DEDENT', 0))
+
     return tokens

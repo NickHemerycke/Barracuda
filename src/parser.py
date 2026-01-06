@@ -22,7 +22,7 @@ class Parser:
     def parseProgram(self):
         statements = []
         while self.peek():
-            statements.append(self.parse_statements())
+            statements.append(self.parseStatement())
         return statements
     
     def parseStatement(self):
@@ -36,6 +36,13 @@ class Parser:
             return self.parseWhileDeclare()
         elif token[0] == "FUNC":
             return self.parseFuncDeclare()
+        elif token[0] == "RET":
+            return self.parseReturnDeclare()
+        elif token[0] == "NEWLINE":
+            self.consume("NEWLINE")
+            return self.parseStatement()
+        elif token[0] == "DEDENT":
+            return None
         else:
             return self.parseExpression()
         
@@ -58,7 +65,7 @@ class Parser:
         nameTok = self.consume("ID")
         self.consume("ASSIGN")
         
-        valueNode = self.parse_expression() 
+        valueNode = self.parseExpression() 
     
         if self.peek() and self.peek()[0] == "NEWLINE":
             self.consume("NEWLINE")
@@ -76,19 +83,26 @@ class Parser:
 
         left = self.consume("ID")
         self.consume("ASSIGN")
-        right = self.parseExpression
+        right = self.parseExpression()
+
+        if self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
 
         self.consume("INDENT")
 
         body = []
-        while self.peek()[0] != "DEDENT":
-            body.append(self.parseStatement())
+        while self.peek() and self.peek()[0] != "DEDENT":
+            stmt = self.parseStatement()
+            if stmt is not None:
+                body.append(stmt)
+
         self.consume("DEDENT")
 
         return IfNode(
             condition=(left[1], "==", right),
-            thenBranch = body
+            thenBranch=body
         )
+
     
     """example of a while statement is " while: x < 5"
                                             x = x + 1
@@ -133,6 +147,15 @@ class Parser:
         self.consume("DEDENT")
 
         return FuncNode(name, args, body)
+    
+    def parseReturnDeclare(self):
+        self.consume("RET")
+        valueNode = self.parseExpression()
+
+        if self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
+
+        return ReturnNode(valueNode)
     
 
 

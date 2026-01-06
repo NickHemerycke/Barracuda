@@ -1,11 +1,14 @@
-from lexer import lex_barracuda
+from lexer import lexBarracuda
 from parser import Parser
 from interpreter import Interpreter
+ 
 
-source = open("test.cuda").read()
+source = open("/home/nickhemerycke/Documents/projects/Insanity/Barracuda/tests/test.cuda").read()
 
-tokens = lex_barracuda(source)
-ast = Parser(tokens).parse_program()
+tokens = lexBarracuda(source)
+for t in tokens:
+    print(t)
+ast = Parser(tokens).parseProgram()
 
 result = Interpreter().run(ast)
 print(result)
