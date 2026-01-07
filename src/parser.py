@@ -22,11 +22,18 @@ class Parser:
     def parseProgram(self):
         statements = []
         while self.peek():
-            statements.append(self.parseStatement())
+            stmt = self.parseStatement()
+            if stmt is not None:
+                statements.append(stmt)
         return statements
     
     def parseStatement(self):
+        while self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
+
         token = self.peek()
+        if not token:
+            return None
 
         if token[0] == "VAR":
             return self.parseVarDeclare()
@@ -38,13 +45,12 @@ class Parser:
             return self.parseFuncDeclare()
         elif token[0] == "RET":
             return self.parseReturnDeclare()
-        elif token[0] == "NEWLINE":
-            self.consume("NEWLINE")
-            return self.parseStatement()
         elif token[0] == "DEDENT":
+            self.consume("DEDENT")
             return None
         else:
             return self.parseExpression()
+
         
     def parseExpression(self):
 
@@ -78,6 +84,8 @@ class Parser:
     """
 
     def parseIfDeclare(self):
+        controller = True
+
         self.consume("IF")
         self.consume("COLON")
 
@@ -85,26 +93,36 @@ class Parser:
         self.consume("ASSIGN")
         right = self.parseExpression()
 
-        if self.peek() and self.peek()[0] == "NEWLINE":
-            self.consume("NEWLINE")
+        while controller == True:
+            if self.peek() and self.peek()[0] == "NEWLINE":
+                self.consume("NEWLINE")
+            else:
+                controller = False
 
         self.consume("INDENT")
-
+        elseBody = None
         thenBody = []
-        while self.peek() and self.peek()[0] != "DEDENT":
+        while self.peek() and self.peek()[0] not in ("DEDENT", "ELSE"):
             stmt = self.parseStatement()
             if stmt is not None:
                 thenBody.append(stmt)
+        if self.peek() and self.peek()[0] == "DEDENT":
 
-        self.consume("DEDENT")
+            self.consume("DEDENT")
 
         if self.peek() and self.peek()[0] == "ELSE":
+
+            elseController = True
+
             self.consume("ELSE")
             self.consume("COLON")
 
-            if self.peek() and self.peek()[0] == "NEWLINE":
-                self.consume("NEWLINE")
 
+            while elseController == True:
+                if self.peek() and self.peek()[0] == "NEWLINE":
+                    self.consume("NEWLINE")
+                else:
+                    elseController = False
 
             self.consume("INDENT")
 
@@ -113,7 +131,9 @@ class Parser:
                 stmt = self.parseStatement()
                 if stmt is not None:
                     elseBody.append(stmt)
-            self.consume("DEDENT")
+            if self.peek() and self.peek()[0] == "DEDENT":
+
+                self.consume("DEDENT")
 
         return IfNode(
             condition=(left[1], "==", right),

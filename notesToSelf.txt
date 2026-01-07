@@ -3,3 +3,5 @@ This is quite frustrating as this is already way more complex then i imagined
 it's fun though can't wait till i get to play around with wasm
 
 
+so currently my nested logic is broken down and i'm not smart enough to figure this out so ive asked ai 
+and figure this it aint smart enough either so i guess its my job afterall
