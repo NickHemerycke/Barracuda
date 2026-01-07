@@ -12,8 +12,9 @@ class IfNode:
         self.elseBranch = elseBranch
 
 class WhileNode:
-    def __init(self, condition):
+    def __init__(self, condition,body):
         self.condition = condition
+        self.body = body
 
 #can't forget still gotta work on those just going crazy from seeing the none declare issue
 

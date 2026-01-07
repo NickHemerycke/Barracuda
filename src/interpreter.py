@@ -1,4 +1,4 @@
-from astNodes import varNode, IfNode, ReturnNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode
 
 class ReturnSignal(Exception):
     def __init__(self, value):
@@ -9,16 +9,38 @@ class Interpreter:
         self.env = {}
 
     def evalExpression(self, node):
-        kind, value = node
-        if kind == "NUM":
-            return int(value)
-        elif kind == "BOOL_VAL":
-            return value == "TRUE"
-        elif kind == "ID":
-            if value in self.env:
-                return self.env[value]
+        kind = node[0]
+        if kind == "BIN_OP":
+            _, op, left, right = node
+            leftValue = self.evalExpression(left)
+            rightValue = self.evalExpression(right)
+
+            if op == "+":
+                return leftValue + rightValue
+            elif op == "-":
+                return leftValue - rightValue
+            elif op == "==":
+                return leftValue == rightValue
+            elif op == "<":
+                return leftValue < rightValue
+            elif op == ">":
+                return leftValue > rightValue
+            elif op == "<=":
+                return leftValue <= rightValue
+            elif op == ">=":
+                return leftValue >= rightValue
             else:
-                raise NameError(f"Variable '{value}' not defined")
+                raise ValueError(f"Unknown operator: {op}")
+
+        elif kind == "NUM":
+            return int(node[1])
+        elif kind == "BOOL_VAL":
+            return node[1] == "TRUE"
+        elif kind == "ID":
+            if node[1] in self.env:
+                return self.env[node[1]]
+            else:
+                raise NameError(f"Variable '{node[1]}' not defined")
         else:
             raise ValueError(f"Unknown expression type: {kind}")
 
@@ -42,6 +64,18 @@ class Interpreter:
         elif node.elseBranch is not None:
             for stmt in node.elseBranch:
                 self.execStatement(stmt)
+    
+    def execWhile(self,node):
+        
+        while self.evalExpression(node.condition):
+            for stmt in node.body:
+                self.execStatement(stmt)
+
+    def execAssign(self, node):
+        value = self.evalExpression(node.value)
+        self.env[node.name] = value
+
+
 
 
     def execStatement(self, node):
@@ -49,6 +83,8 @@ class Interpreter:
             self.execVar(node)
         elif isinstance(node, IfNode):
             self.execIf(node)
+        elif isinstance(node, WhileNode):
+            self.execWhile(node)
         elif isinstance(node, ReturnNode):
             self.execReturn(node)
 

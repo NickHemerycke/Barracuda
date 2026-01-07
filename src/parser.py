@@ -57,10 +57,19 @@ class Parser:
         token = self.peek()
         if token[0] in ("ID", "NUM", "BOOL_VAL"):
             self.pos += 1
-            return token
-        raise SyntaxError(f"Expected expression, got {token}")
-        
-        
+            left = token
+        else:
+            raise SyntaxError(f"Expected expression, got {token}")
+
+        if self.peek() and self.peek()[0] in ("PLUS", "MINUS", "ASSIGN","NE", "ST", "GT", "STE", "GTE"):
+            op = self.consume(self.peek()[0])
+       
+            right = self.parseExpression()
+      
+            return ("BIN_OP", op[1], left, right)
+
+        return left
+            
 #grammar section
 
     #example of var declarion is "var int x == 5"
@@ -147,10 +156,15 @@ class Parser:
     """
     
     def parseWhileDeclare(self):
+
+        controller = True
         self.consume("WHILE")
         self.consume("COLON")
 
         condition = self.parseExpression()
+
+        while self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
 
         self.consume("INDENT")
 

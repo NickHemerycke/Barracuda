@@ -1,9 +1,12 @@
 from lexer import lexBarracuda
 from parser import Parser
 from interpreter import Interpreter
- 
 
-source = open("/home/nickhemerycke/Documents/projects/Insanity/Barracuda/tests/test.cuda").read()
+document = "/home/nickhemerycke/Documents/projects/Insanity/Barracuda/tests/"
+document = document + (input("Title of test document: "))
+
+
+source = open(document).read()
 
 tokens = lexBarracuda(source)
 for t in tokens:
