@@ -188,6 +188,7 @@ class Parser:
     
     def parseReturnDeclare(self):
         self.consume("RET")
+        self.consume("COLON")
         valueNode = self.parseExpression()
 
         if self.peek() and self.peek()[0] == "NEWLINE":
