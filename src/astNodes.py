@@ -25,3 +25,12 @@ class FuncNode:
 class ReturnNode:
     def __init__(self, value):
         self.value = value
+
+class AssignNode:
+    def __init__(self, name, expr):
+        self.name = name
+        self.expr = expr
+
+class PrintNode:
+    def __init__(self, value):
+        self.value = value

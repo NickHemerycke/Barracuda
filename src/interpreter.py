@@ -1,4 +1,4 @@
-from astNodes import varNode, IfNode, ReturnNode, WhileNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode, AssignNode, PrintNode
 
 class ReturnSignal(Exception):
     def __init__(self, value):
@@ -19,7 +19,7 @@ class Interpreter:
                 return leftValue + rightValue
             elif op == "-":
                 return leftValue - rightValue
-            elif op == "==":
+            elif op == "===":
                 return leftValue == rightValue
             elif op == "<":
                 return leftValue < rightValue
@@ -72,10 +72,12 @@ class Interpreter:
                 self.execStatement(stmt)
 
     def execAssign(self, node):
-        value = self.evalExpression(node.value)
+        value = self.evalExpression(node.expr)
         self.env[node.name] = value
 
-
+    def execPrint(self, node):
+        value = self.evalExpression(node.value)
+        print(value)
 
 
     def execStatement(self, node):
@@ -87,6 +89,10 @@ class Interpreter:
             self.execWhile(node)
         elif isinstance(node, ReturnNode):
             self.execReturn(node)
+        elif isinstance(node, AssignNode):
+            self.execAssign(node)
+        elif isinstance(node, PrintNode):
+            self.execPrint(node)
 
     def run(self, statements):
         try:

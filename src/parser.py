@@ -1,4 +1,4 @@
-from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode, AssignNode, PrintNode
 
 class Parser:
     def __init__(self, tokens):
@@ -43,6 +43,10 @@ class Parser:
             return self.parseWhileDeclare()
         elif token[0] == "FUNC":
             return self.parseFuncDeclare()
+        elif token[0] == "ID" and self.peek(1) and self.peek(1)[0] == "ASSIGN":
+            return self.parseAssignDeclare()
+        elif token[0] == "PRINTLN":
+            return self.parsePrintlnDeclare()
         elif token[0] == "RET":
             return self.parseReturnDeclare()
         elif token[0] == "DEDENT":
@@ -61,7 +65,7 @@ class Parser:
         else:
             raise SyntaxError(f"Expected expression, got {token}")
 
-        if self.peek() and self.peek()[0] in ("PLUS", "MINUS", "ASSIGN","NE", "ST", "GT", "STE", "GTE"):
+        if self.peek() and self.peek()[0] in ("PLUS", "MINUS", "COMPARISON","NE", "ST", "GT", "STE", "GTE"):
             op = self.consume(self.peek()[0])
        
             right = self.parseExpression()
@@ -175,6 +179,17 @@ class Parser:
         self.consume("DEDENT")
 
         return WhileNode(condition, body)
+
+    def parseAssignDeclare(self):
+        name = self.consume("ID")[1]
+        self.consume("ASSIGN")
+
+        expr = self.parseExpression()
+
+        if self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
+
+        return AssignNode(name, expr)
     
 
     def parseFuncDeclare(self):
@@ -210,5 +225,14 @@ class Parser:
 
         return ReturnNode(valueNode)
     
+    def parsePrintlnDeclare(self):
+        self.consume("PRINTLN")
+        self.consume("COLON")
+        valueNode = self.parseExpression()
+
+        if self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
+        
+        return PrintNode(valueNode)
 
 

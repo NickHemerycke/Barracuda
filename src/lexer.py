@@ -1,7 +1,8 @@
 import re
 
 TOKEN_SPEC = [
-    ('FUNC',    r'func'),         
+    ('FUNC',    r'func'),
+    ('PRINTLN', r'println'),         
     ('VAR',     r'var'),
     ('WHILE',   r'while'),           
     ('CONST',   r'const'),        
@@ -9,7 +10,8 @@ TOKEN_SPEC = [
     ('ELSE',    r'else'),         
     ('RET',     r'return'),       
     ('TYPE',    r'int|bool|flo|str'),      
-    ('BOOL_VAL',r'TRUE|FALSE'),    
+    ('BOOL_VAL',r'TRUE|FALSE'), 
+    ('COMPARISON', r'==='),
     ('ASSIGN',  r'=='),
     ('NE',     r'!='),
     ('PLUS',    r'\+'), 
