@@ -5,19 +5,22 @@ class Parser:
         self.tokens = tokens
         self.pos = 0
 
-    def peek(self):
-        if self.pos < len(self.tokens):
-            return self.tokens[self.pos]
+    def peek(self, offset=0):
+        pos = self.pos + offset
+        if pos < len(self.tokens):
+            return self.tokens[pos]
         return None
     
     def consume(self, expected_type):
         token = self.peek()
-        if token and token[0] == expected_type:
+        if token is None:
+            raise SyntaxError(f"Expected {expected_type}, got EOF")
+        if token[0] == expected_type:
             self.pos += 1
             return token
         else:
             raise SyntaxError(f"Expected {expected_type}, got {token}")
-        
+
 
     def parseProgram(self):
         statements = []
@@ -102,15 +105,10 @@ class Parser:
         self.consume("IF")
         self.consume("COLON")
 
-        left = self.consume("ID")
-        self.consume("ASSIGN")
-        right = self.parseExpression()
+        condition = self.parseExpression()
 
-        while controller == True:
-            if self.peek() and self.peek()[0] == "NEWLINE":
-                self.consume("NEWLINE")
-            else:
-                controller = False
+        while self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
 
         self.consume("INDENT")
         elseBody = None
@@ -148,11 +146,7 @@ class Parser:
 
                 self.consume("DEDENT")
 
-        return IfNode(
-            condition=(left[1], "==", right),
-            thenBranch=thenBody,
-            elseBranch=elseBody
-        )
+        return IfNode(condition, thenBody, elseBody)
 
     
     """example of a while statement is " while: x < 5"
@@ -173,12 +167,15 @@ class Parser:
         self.consume("INDENT")
 
         body = []
-        while self.peek()[0] != "DEDENT":
-            body.append(self.parseStatement())
+        while self.peek() and self.peek()[0] != "DEDENT":
+            stmt = self.parseStatement()
+            if stmt is not None:
+                body.append(stmt)
 
-        self.consume("DEDENT")
+        while self.peek() and self.peek()[0] == "DEDENT":
+            self.consume("DEDENT")
 
-        return WhileNode(condition, body)
+            return WhileNode(condition, body)
 
     def parseAssignDeclare(self):
         name = self.consume("ID")[1]

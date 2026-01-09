@@ -29,6 +29,8 @@ class Interpreter:
                 return leftValue <= rightValue
             elif op == ">=":
                 return leftValue >= rightValue
+            elif op == "!=":
+                return leftValue != rightValue
             else:
                 raise ValueError(f"Unknown operator: {op}")
 
@@ -54,24 +56,25 @@ class Interpreter:
         raise ReturnSignal(val)
     
     def execIf(self, node):
-        left, _, right = node.condition
-
-        conditionTrue = self.env[left] == self.evalExpression(right)
-
-        if conditionTrue:
+        if self.evalExpression(node.condition):
             for stmt in node.thenBranch:
                 self.execStatement(stmt)
         elif node.elseBranch is not None:
             for stmt in node.elseBranch:
                 self.execStatement(stmt)
+
     
     def execWhile(self,node):
+
+        print("intiated while")
         
         while self.evalExpression(node.condition):
             for stmt in node.body:
                 self.execStatement(stmt)
 
     def execAssign(self, node):
+        if node.name not in self.env:
+            raise NameError(f"Variable '{node.name}' not declared")
         value = self.evalExpression(node.expr)
         self.env[node.name] = value
 
@@ -100,6 +103,7 @@ class Interpreter:
                 self.execStatement(stmt)
         except ReturnSignal as r:
             return r.value
+        
     
 
 

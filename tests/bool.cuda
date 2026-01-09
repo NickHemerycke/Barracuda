@@ -1,0 +1,9 @@
+var bool x == TRUE
+var int y == 0
+while: x === TRUE
+    y == y + 1
+    println: y
+    if: y === 10
+        x == FALSE
+
+return: y

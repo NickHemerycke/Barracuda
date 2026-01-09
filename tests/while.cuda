@@ -1,5 +1,5 @@
 var int x == 0
 while: x < 5
-    var int x == x + 1
+    x == x + 1
     println: x
 return: x

@@ -1,0 +1,12 @@
+var int x == 3
+var int y == 2
+var int z == 1
+while: z === 1
+    if: x === y
+        println: x
+        println: y
+        z == 2  
+    else:
+        x == x - 1
+        println: x
+return: z
