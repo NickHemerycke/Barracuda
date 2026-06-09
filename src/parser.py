@@ -1,4 +1,4 @@
-from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode, FuncCallNode, AssignNode, PrintNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode, FuncCallNode, AssignNode, PrintNode, BreakNode, ContinueNode
 
 _COMPARISON_OPS = ("EQ", "NE", "ST", "GT", "STE", "GTE")
 _BINARY_OPS     = ("PLUS", "MINUS") + _COMPARISON_OPS
@@ -64,6 +64,10 @@ class Parser:
             return self.parseAssignDeclare()
         elif token[0] == "PRINTLN":
             return self.parsePrintlnDeclare()
+        elif token[0] == "BREAK":
+            return self.parseBreak()
+        elif token[0] == "CONT":
+            return self.parseContinue()
         elif token[0] == "RET":
             return self.parseReturnDeclare()
         elif token[0] == "DEDENT":
@@ -191,6 +195,19 @@ class Parser:
         if self.peek() and self.peek()[0] == "NEWLINE":
             self.consume("NEWLINE")
         return ReturnNode(valueNode)
+    
+
+    def parseBreak(self):
+        self.consume("BREAK")
+        if self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
+        return BreakNode()
+
+    def parseContinue(self):
+        self.consume("CONT")
+        if self.peek() and self.peek()[0] == "NEWLINE":
+            self.consume("NEWLINE")
+        return ContinueNode()
 
     # println: expr
     def parsePrintlnDeclare(self):

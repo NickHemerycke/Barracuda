@@ -1,8 +1,15 @@
-from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode, FuncCallNode, AssignNode, PrintNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode, FuncCallNode, AssignNode, PrintNode, BreakNode, ContinueNode
 
 class ReturnSignal(Exception):
     def __init__(self, value):
         self.value = value
+
+
+class BreakSignal(Exception):
+    pass
+
+class ContinueSignal(Exception):
+    pass
 
 class Interpreter:
     def __init__(self):
@@ -64,8 +71,13 @@ class Interpreter:
 
     def execWhile(self, node):
         while self.evalExpression(node.condition):
-            for stmt in node.body:
-                self.execStatement(stmt)
+            try:
+                for stmt in node.body:
+                    self.execStatement(stmt)
+            except ContinueSignal:
+                continue
+            except BreakSignal:
+                break
 
     def execFunc(self, node):
         self.funcs[node.name] = node
@@ -110,6 +122,10 @@ class Interpreter:
             self.execPrint(node)
         elif isinstance(node, FuncCallNode):
             self.evalExpression(node)
+        elif isinstance(node, BreakNode):
+            raise BreakSignal()
+        elif isinstance(node, ContinueNode):
+            raise ContinueSignal()
 
     def run(self, statements):
         try:

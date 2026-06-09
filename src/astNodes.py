@@ -38,3 +38,9 @@ class AssignNode:
 class PrintNode:
     def __init__(self, value):
         self.value = value
+
+class BreakNode:
+    pass
+
+class ContinueNode:
+    pass
