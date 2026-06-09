@@ -1,0 +1,65 @@
+func: gcd: x, y
+    while: x != y
+        if: x > y
+            x = x - y
+        else:
+            y = y - x
+    return: x
+
+func: larger: x, y
+    if: x > y
+        return: x
+    else:
+        return: y
+
+var int a = 64
+var int b = 34
+var int c = 25
+var int d = 12
+var int e = 22
+var int tmp = 0
+var bool swapped = TRUE
+var int passes = 0
+
+println: a
+println: b
+println: c
+println: d
+println: e
+
+while: swapped == TRUE
+    swapped = FALSE
+    passes = passes + 1
+    if: a > b
+        tmp = a
+        a = b
+        b = tmp
+        swapped = TRUE
+    if: b > c
+        tmp = b
+        b = c
+        c = tmp
+        swapped = TRUE
+    if: c > d
+        tmp = c
+        c = d
+        d = tmp
+        swapped = TRUE
+    if: d > e
+        tmp = d
+        d = e
+        e = tmp
+        swapped = TRUE
+
+println: a
+println: b
+println: c
+println: d
+println: e
+println: passes
+
+var int g = gcd: 34, 22
+println: g
+
+var int big = larger: a, e
+println: big

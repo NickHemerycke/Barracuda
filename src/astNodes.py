@@ -1,5 +1,4 @@
 class varNode:
-
     def __init__(self, varType, name, valueNode):
         self.varType = varType
         self.name = name
@@ -12,15 +11,20 @@ class IfNode:
         self.elseBranch = elseBranch
 
 class WhileNode:
-    def __init__(self, condition,body):
+    def __init__(self, condition, body):
         self.condition = condition
         self.body = body
 
-#can't forget still gotta work on those just going crazy from seeing the none declare issue
-
 class FuncNode:
-    def __init__(self):
-        return None
+    def __init__(self, name, args, body):
+        self.name = name
+        self.args = args
+        self.body = body
+
+class FuncCallNode:
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
 
 class ReturnNode:
     def __init__(self, value):

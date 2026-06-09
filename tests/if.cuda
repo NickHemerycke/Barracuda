@@ -1,11 +1,11 @@
-var int x == 6
-var int y == 6
-var int z == 10
-if: x === y
+var int x = 6
+var int y = 6
+var int z = 10
+if: x == y
 
-    if: z === 10
-        
-        if: x === 5
+    if: z == 10
+
+        if: x == 5
             return: 5
         else:
 
@@ -14,4 +14,4 @@ else:
     if: x == 5
         return: 5
     else:
-        return: FALSE
+        return: x

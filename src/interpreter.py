@@ -1,4 +1,4 @@
-from astNodes import varNode, IfNode, ReturnNode, WhileNode, AssignNode, PrintNode
+from astNodes import varNode, IfNode, ReturnNode, WhileNode, FuncNode, FuncCallNode, AssignNode, PrintNode
 
 class ReturnSignal(Exception):
     def __init__(self, value):
@@ -7,31 +7,32 @@ class ReturnSignal(Exception):
 class Interpreter:
     def __init__(self):
         self.env = {}
+        self.funcs = {}
 
     def evalExpression(self, node):
+        if isinstance(node, FuncCallNode):
+            if node.name not in self.funcs:
+                raise NameError(f"Function '{node.name}' not defined")
+            func = self.funcs[node.name]
+            if len(node.args) != len(func.args):
+                raise TypeError(f"'{node.name}' expects {len(func.args)} args, got {len(node.args)}")
+            arg_values = [self.evalExpression(a) for a in node.args]
+            return self.callFunc(func, arg_values)
+
         kind = node[0]
         if kind == "BIN_OP":
             _, op, left, right = node
-            leftValue = self.evalExpression(left)
-            rightValue = self.evalExpression(right)
-
-            if op == "+":
-                return leftValue + rightValue
-            elif op == "-":
-                return leftValue - rightValue
-            elif op == "===":
-                return leftValue == rightValue
-            elif op == "<":
-                return leftValue < rightValue
-            elif op == ">":
-                return leftValue > rightValue
-            elif op == "<=":
-                return leftValue <= rightValue
-            elif op == ">=":
-                return leftValue >= rightValue
-            else:
-                raise ValueError(f"Unknown operator: {op}")
-
+            lv = self.evalExpression(left)
+            rv = self.evalExpression(right)
+            if op == "+":  return lv + rv
+            if op == "-":  return lv - rv
+            if op == "==": return lv == rv
+            if op == "!=": return lv != rv
+            if op == "<":  return lv < rv
+            if op == ">":  return lv > rv
+            if op == "<=": return lv <= rv
+            if op == ">=": return lv >= rv
+            raise ValueError(f"Unknown operator: {op}")
         elif kind == "NUM":
             return int(node[1])
         elif kind == "BOOL_VAL":
@@ -39,46 +40,58 @@ class Interpreter:
         elif kind == "ID":
             if node[1] in self.env:
                 return self.env[node[1]]
-            else:
-                raise NameError(f"Variable '{node[1]}' not defined")
+            raise NameError(f"Variable '{node[1]}' not defined")
         else:
             raise ValueError(f"Unknown expression type: {kind}")
 
-
     def execVar(self, node):
         val = self.evalExpression(node.value)
+        if node.varType == "int":
+            if not isinstance(val, int) or isinstance(val, bool):
+                raise TypeError(f"'{node.name}' declared as int but got {type(val).__name__}")
+        elif node.varType == "bool":
+            if not isinstance(val, bool):
+                raise TypeError(f"'{node.name}' declared as bool but got {type(val).__name__}")
         self.env[node.name] = val
 
-    def execReturn(self, node):
-        val = self.evalExpression(node.value)
-        raise ReturnSignal(val)
-    
     def execIf(self, node):
-        left, _, right = node.condition
-
-        conditionTrue = self.env[left] == self.evalExpression(right)
-
-        if conditionTrue:
+        if self.evalExpression(node.condition):
             for stmt in node.thenBranch:
                 self.execStatement(stmt)
         elif node.elseBranch is not None:
             for stmt in node.elseBranch:
                 self.execStatement(stmt)
-    
-    def execWhile(self,node):
-        
+
+    def execWhile(self, node):
         while self.evalExpression(node.condition):
             for stmt in node.body:
                 self.execStatement(stmt)
 
+    def execFunc(self, node):
+        self.funcs[node.name] = node
+
+    def callFunc(self, func_node, arg_values):
+        saved_env = self.env
+        self.env = dict(saved_env)
+        for param, val in zip(func_node.args, arg_values):
+            self.env[param] = val
+        try:
+            for stmt in func_node.body:
+                self.execStatement(stmt)
+            return None
+        except ReturnSignal as r:
+            return r.value
+        finally:
+            self.env = saved_env
+
     def execAssign(self, node):
-        value = self.evalExpression(node.expr)
-        self.env[node.name] = value
+        self.env[node.name] = self.evalExpression(node.expr)
+
+    def execReturn(self, node):
+        raise ReturnSignal(self.evalExpression(node.value))
 
     def execPrint(self, node):
-        value = self.evalExpression(node.value)
-        print(value)
-
+        print(self.evalExpression(node.value))
 
     def execStatement(self, node):
         if isinstance(node, varNode):
@@ -87,12 +100,16 @@ class Interpreter:
             self.execIf(node)
         elif isinstance(node, WhileNode):
             self.execWhile(node)
+        elif isinstance(node, FuncNode):
+            self.execFunc(node)
         elif isinstance(node, ReturnNode):
             self.execReturn(node)
         elif isinstance(node, AssignNode):
             self.execAssign(node)
         elif isinstance(node, PrintNode):
             self.execPrint(node)
+        elif isinstance(node, FuncCallNode):
+            self.evalExpression(node)
 
     def run(self, statements):
         try:
@@ -100,10 +117,3 @@ class Interpreter:
                 self.execStatement(stmt)
         except ReturnSignal as r:
             return r.value
-    
-
-
-
-
-
-

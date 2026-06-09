@@ -1,17 +1,17 @@
+import sys
 from lexer import lexBarracuda
 from parser import Parser
 from interpreter import Interpreter
 
-document = "/home/nickhemerycke/Documents/projects/Insanity/Barracuda/tests/"
-document = document + (input("Title of test document: "))
+if len(sys.argv) < 2:
+    print("Usage: python main.py <path/to/file.cuda>")
+    sys.exit(1)
 
-
-source = open(document).read()
+with open(sys.argv[1]) as f:
+    source = f.read()
 
 tokens = lexBarracuda(source)
-for t in tokens:
-    print(t)
 ast = Parser(tokens).parseProgram()
-
 result = Interpreter().run(ast)
-print(result)
+if result is not None:
+    print(result)
